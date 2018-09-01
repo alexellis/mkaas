@@ -38,7 +38,11 @@ spec:
 
 * What do I need?
 
-You need KVM and libvirtd installed on your host machine and Kubernetes installed too.
+On your host you'll need virtualization support / KVM support.
+
+* KVM package
+* libvirtd
+* Kubernetes (a single-node tainted master with kubeadm is fine)
 
 Add the KVM packages for your distro (tested with Ubuntu):
 
