@@ -29,6 +29,7 @@ apiVersion: "alexellis.io/v1alpha1"
 kind: "Minikube"
 metadata:
   name: "alex"
+  namespace: clusters
 spec:
   clusterName: "alex"
   cpuCount: 2
