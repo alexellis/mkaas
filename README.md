@@ -72,6 +72,12 @@ cluster and the IP of the node.
 
 Run squid on the host with host-networking (in the future this will be automated)
 
+This will be automated later, but for now:
+
+```
+docker run -d --name proxy --host=net -p 3128:3128 alexellis2/squid-proxy:0.1
+```
+
 Now:
 
 On the host:
