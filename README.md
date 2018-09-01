@@ -80,7 +80,7 @@ Run squid on the host with host-networking (in the future this will be automated
 This will be automated later, but for now:
 
 ```
-docker run -d --name proxy --net=host -p 3128:3128 alexellis2/squid-proxy:0.1
+docker run -d --name proxy --net=host alexellis2/squid-proxy:0.1
 ```
 
 Now:
@@ -114,3 +114,10 @@ export KUBECONFIG=./config
 kubectl get node
 ```
 
+## Development
+
+Operator logs:
+
+```
+kubectl logs -n clusters deploy/minikube -f
+```
