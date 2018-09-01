@@ -2,9 +2,11 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: minikube
+  namespace: clusters
 rules:
 - apiGroups:
   - alexellis.io
+  - extensions
   resources:
   - "*"
   verbs:
@@ -12,6 +14,7 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - daemonsets
   - pods
   - services
   - endpoints
@@ -23,6 +26,7 @@ rules:
   - "*"
 - apiGroups:
   - apps
+  - extensions
   resources:
   - deployments
   - daemonsets
@@ -37,6 +41,7 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: default-account-minikube
+  namespace: clusters
 subjects:
 - kind: ServiceAccount
   name: default
