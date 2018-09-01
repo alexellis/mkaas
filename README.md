@@ -45,6 +45,7 @@ Add the KVM packages for your distro (tested with Ubuntu):
 sudo apt-get install -qy \
   qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
 sudo kvm-ok
+sudo usermod root -aG libvirtd
 ```
 
 Follow [these steps](https://gist.github.com/alexellis/eec21a96906726d08a071d58aee66ab9#create-a-cluster-with-kubeadm) on Ubuntu 16.04 up until you get to "Create a cluster with kubeadm".
