@@ -1,10 +1,15 @@
 # mkaas
 Minikube as a Service
 
+## PoC demo
+
+[![asciicast](https://asciinema.org/a/s1UWfywtfpOp9be2r7igbbnBB.png)](https://asciinema.org/a/s1UWfywtfpOp9be2r7igbbnBB)
+
 ## How does it work?
 
 This combines a custom resource for defining minikube clusters and an Operator for Kubernetes
 to schedule Pods that create your minikube clusters.
+
 
 Example cluster:
 
