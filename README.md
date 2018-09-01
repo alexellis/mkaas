@@ -105,7 +105,12 @@ faas-cli list --gateway $MINIKUBE_IP
 
 For access via `kubectl`:
 
-Use SFTP/SCP to copy the certificates and the kubeconfig from .minikube/ and place them in a folder:
+Use SFTP/SCP to copy the certificates and the kubeconfig from `/root/.minikube` and place them in a new folder:
+
+* `*.crt`
+* `*.key`
+
+Now copy `config` from `/root/.kube`.
 
 Now:
 

@@ -33,11 +33,11 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 			return err
 		}
 
-		err2 := sdk.Create(newProxyDaemonset(o))
-		if err2 != nil && !errors.IsAlreadyExists(err2) {
-			logrus.Errorf("failed to create pod : %v", err2)
-			return err2
-		}
+		// err2 := sdk.Create(newProxyDaemonset(o))
+		// if err2 != nil && !errors.IsAlreadyExists(err2) {
+		// 	logrus.Errorf("failed to create pod : %v", err2)
+		// 	return err2
+		// }
 	}
 
 	return nil
@@ -146,10 +146,19 @@ func newMinikubePod(cr *v1alpha1.Minikube) *corev1.Pod {
 					},
 				},
 				{
-					Name: "root-home",
+					Name: "root-minikube",
 					VolumeSource: corev1.VolumeSource{
 						HostPath: &corev1.HostPathVolumeSource{
 							Path: "/root/.minikube",
+							Type: &pathTypeHostDir,
+						},
+					},
+				},
+				{
+					Name: "root-kube",
+					VolumeSource: corev1.VolumeSource{
+						HostPath: &corev1.HostPathVolumeSource{
+							Path: "/root/.kube",
 							Type: &pathTypeHostDir,
 						},
 					},
@@ -194,6 +203,11 @@ func newMinikubePod(cr *v1alpha1.Minikube) *corev1.Pod {
 						{
 							MountPath:        "/root/.minikube",
 							Name:             "root-home",
+							MountPropagation: &propagate,
+						},
+						{
+							MountPath:        "/root/.kube",
+							Name:             "root-kube",
 							MountPropagation: &propagate,
 						},
 					},
