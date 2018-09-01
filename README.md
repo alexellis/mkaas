@@ -15,7 +15,7 @@ Status: this is a Proof-of-Concept Kubernetes Operator providing Minikube-as-a-S
 
 ## PoC demo
 
-[![asciicast](https://asciinema.org/a/s1UWfywtfpOp9be2r7igbbnBB.png)](https://asciinema.org/a/s1UWfywtfpOp9be2r7igbbnBB)
+[![asciicast](https://asciinema.org/a/O0pWQ6p7slnQ2X8Q5qtIjHqZG.png)](https://asciinema.org/a/O0pWQ6p7slnQ2X8Q5qtIjHqZG)
 
 ## How does it work?
 
