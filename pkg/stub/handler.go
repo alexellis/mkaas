@@ -44,14 +44,10 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 }
 
 func newProxyDaemonset(cr *v1alpha1.Minikube) *v1beta1.DaemonSet {
-	labels := map[string]string{
-		"app": cr.ObjectMeta.Name + "-proxy",
-	}
-
 	ds := v1beta1.DaemonSet{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "DaemonSet",
-			APIVersion: "extensions/v1beta1",
+			APIVersion: "apps/v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cr.ObjectMeta.Name + "-proxy",
@@ -63,11 +59,18 @@ func newProxyDaemonset(cr *v1alpha1.Minikube) *v1beta1.DaemonSet {
 					Kind:    "Minikube",
 				}),
 			},
-			Labels: labels,
 		},
 		Spec: v1beta1.DaemonSetSpec{
+
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{"daemonset": cr.Name + "-daemonset"},
+			},
 			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{"daemonset": cr.Name + "-daemonset"},
+				},
 				Spec: corev1.PodSpec{
+					// NodeSelector: map[string]string{"daemon": cr.Spec.Label},
 					Containers: []corev1.Container{
 						{
 							Name:  "proxy",
@@ -163,14 +166,21 @@ func newMinikubePod(cr *v1alpha1.Minikube) *corev1.Pod {
 						},
 					},
 				},
+				{
+					Name: "var-mkaas",
+					VolumeSource: corev1.VolumeSource{
+						HostPath: &corev1.HostPathVolumeSource{
+							Path: "/var/mkaas",
+							Type: &pathTypeHostDir,
+						},
+					},
+				},
 			},
 			HostNetwork: true,
-			// HostPID:     true,
-			// HostIPC:     true,
 			Containers: []corev1.Container{
 				{
 					Name:  "libvirt",
-					Image: "alexellis2/libvirt-xenial-minikube:0.2",
+					Image: "alexellis2/libvirt-xenial-minikube:0.3",
 					SecurityContext: &corev1.SecurityContext{
 						Privileged: &privileged,
 					},
@@ -208,6 +218,11 @@ func newMinikubePod(cr *v1alpha1.Minikube) *corev1.Pod {
 						{
 							MountPath:        "/root/.kube",
 							Name:             "root-kube",
+							MountPropagation: &propagate,
+						},
+						{
+							MountPath:        "/var/mkaas",
+							Name:             "var-mkaas",
 							MountPropagation: &propagate,
 						},
 					},

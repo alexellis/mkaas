@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: minikube
-          image: alexellis2/mko:v0.0.5
+          image: alexellis2/mko:v0.0.6
           ports:
           - containerPort: 60000
             name: metrics

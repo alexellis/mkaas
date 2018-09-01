@@ -10,7 +10,6 @@ Minikube as a Service
 This combines a custom resource for defining minikube clusters and an Operator for Kubernetes
 to schedule Pods that create your minikube clusters.
 
-
 Example cluster:
 
 ```yaml
@@ -49,6 +48,12 @@ Yes and if you use an NFS mount it may even allow for "motion" between hosts.
 ## Usage:
 
 * Install [operator-sdk](https://github.com/operator-framework/operator-sdk)
+
+* Make a global settings folder:
+
+```
+sudo mkdir /var/mkaas
+```
 
 * Clone this repo into the $GOPATH
 
@@ -101,12 +106,14 @@ docker run -d --name proxy --net=host alexellis2/squid-proxy:0.1
 
 Now:
 
-On the host:
+Get your Minikube IP either when we copy the .kube/config file down later on, or on the host with this command:
 
 ```
-sudo -i
-minikube ip --profile alex
+sudo -i minikube ip --profile alex
+192.168.39.125
 ```
+
+Note down your minikube IP, for example: `192.168.39.125`.
 
 On your client:
 
@@ -119,20 +126,62 @@ faas-cli list --gateway $MINIKUBE_IP
 
 For access via `kubectl`:
 
-Use SFTP/SCP to copy the certificates and the kubeconfig from `/root/.minikube` and place them in a new folder:
+Copy the bundle to your client/laptop and untar using (sftp/scp):
 
-* `*.crt`
-* `*.key`
+```
+mkdir -p mkaas
+cd mkaas
 
-Now copy `config` from `/root/.kube`.
+scp node:/var/mkaas/alex-bundle.tgz .
+tar -xvf alex-bundle.tgz
+```
+
+If your home directory is `/home/alex/` then do the following:
+
+``` 
+sed -ie 's#/root/#/home/alex/mkaas/#g' .kube/config
+```
+
+This changes the absolute paths used for the root user to match the point you copied to.
 
 Now:
 
 ```
 export http_proxy=http://node_ip:3128
-export KUBECONFIG=./config
+export KUBECONFIG=.kube/config
 
 kubectl get node
+NAME       STATUS    ROLES     AGE       VERSION
+minikube   Ready     master    24m       v1.10.0
+```
+
+* Deploy a test workload and access over the proxy
+
+Add the CLI if not present:
+
+```
+curl -sLSf https://cli.openfaas.com | sudo sh
+```
+
+Deploy OpenFaaS:
+
+```
+git clone https://github.com/openfaas/faas-netes
+kubectl apply -f ./faas-netes/namespaces.yml,./faas-netes/yaml
+rm -rf faas-netes
+
+export minikube_ip=
+
+curl $minikube_ip:31112/system/info; echo
+{"provider":{"provider":"faas-netes","version":{"sha":"5539cf43c15a28e9af998cdc25b5da06252b62e1","release":"0.6.0"},"orchestration":"kubernetes"},"version":{"commit_message":"Attach X-Call-Id to asynchronous calls","sha":"c86de503c7a20a46645239b9b081e029b15bf69b","release":"0.8.11"}}
+
+export OPENFAAS_URL=$minikube_ip:31112
+
+faas-cli store deploy figlet
+
+echo "Sleeping for 5 seconds while figlet is downloaded"
+sleep 5
+echo "MKAAS!" | faas-cli invoke figlet
 ```
 
 ## Development
