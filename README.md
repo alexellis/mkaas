@@ -67,3 +67,39 @@ kubectl apply -f .
 
 This will create your first cluster and place a helper Pod into the `clusters` namespace.
 
+Now you can access the cluster from the host using `kubectl` by retrieving the IP of the
+cluster and the IP of the node.
+
+Run squid on the host with host-networking (in the future this will be automated)
+
+Now:
+
+On the host:
+
+```
+sudo -i
+minikube ip --profile alex
+```
+
+On your client:
+
+For HTTP access:
+
+```
+export http_proxy=http://node_ip:3128
+faas-cli list --gateway $MINIKUBE_IP
+```
+
+For access via `kubectl`:
+
+Use SFTP/SCP to copy the certificates and the kubeconfig from .minikube/ and place them in a folder:
+
+Now:
+
+```
+export http_proxy=http://node_ip:3128
+export KUBECONFIG=./config
+
+kubectl get node
+```
+
