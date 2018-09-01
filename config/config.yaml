@@ -1,0 +1,3 @@
+apiVersion: alexellis.io/v1alpha1
+kind: Minikube
+projectName: minikube

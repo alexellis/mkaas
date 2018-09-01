@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minikube
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: minikube
+  template:
+    metadata:
+      labels:
+        name: minikube
+    spec:
+      containers:
+        - name: minikube
+          image: alexellis2/mko:v0.0.5
+          ports:
+          - containerPort: 60000
+            name: metrics
+          command:
+          - minikube
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: OPERATOR_NAME
+              value: "minikube"
