@@ -91,25 +91,29 @@ It could be used to create `docker-machine` VMs instead of `minikube` clusters f
 
 ## Usage:
 
-This step is optional if you want to do development.
 
-* Install [operator-sdk](https://github.com/operator-framework/operator-sdk)
+* (Optional) Install [operator-sdk](https://github.com/operator-framework/operator-sdk)
 
 * Make a global settings folder:
 
 ```
 sudo mkdir /var/mkaas
+sudo /root/.minikube
+sudo /root/.kube
 ```
 
-* Clone this repo into the $GOPATH
+* (Optional) Clone this repo into the $GOPATH
 
 ```
 mkdir -p /go/src/github.com/operator-framework/operator-sdk/
 cd /go/src/github.com/operator-framework/operator-sdk/
 git clone https://github.com/operator-framework/operator-sdk
+cd operator-sdk
+git clone https://github.com/alexellis/mkaas minikube
+cd minikube
 ```
 
-* Build/push
+* (Optional) Build/push (optional to rebuild)
 
 ```
 operator-sdk build alexellis2/mko:v0.0.5 && docker push alexellis2/mko:v0.0.5
@@ -117,10 +121,18 @@ operator-sdk build alexellis2/mko:v0.0.5 && docker push alexellis2/mko:v0.0.5
 
 * Deploy on a host:
 
+Setup the Operator, RBAC and CRD:
+
 ```
 kubectl create ns clusters
 cd deploy
-kubectl apply -f .
+kubectl apply -f crd.yaml,operator.yaml,rbac.yaml
+```
+
+Now create the first cluster:
+
+```
+kubectl apply -f cr.yaml
 ```
 
 This will create your first cluster and place a helper Pod into the `clusters` namespace.
