@@ -202,7 +202,7 @@ func newMinikubePod(cr *v1alpha1.Minikube) *corev1.Pod {
 						},
 						{
 							MountPath:        "/root/.minikube",
-							Name:             "root-home",
+							Name:             "root-minikube",
 							MountPropagation: &propagate,
 						},
 						{
