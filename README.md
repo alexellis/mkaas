@@ -39,6 +39,16 @@ spec:
 
 You need KVM and libvirtd installed on your host machine and Kubernetes installed too.
 
+Add the KVM packages for your distro (tested with Ubuntu):
+
+```
+sudo apt-get install -qy \
+  qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
+sudo kvm-ok
+```
+
+Follow [these steps](https://gist.github.com/alexellis/eec21a96906726d08a071d58aee66ab9#create-a-cluster-with-kubeadm) on Ubuntu 16.04 up until you get to "Create a cluster with kubeadm".
+
 You could use `kubeadm` for this. For Cloud turn on nested-virt with GCP or use Packet.net/Scaleway for a bare metal host.
 
 * How does it work?
