@@ -26,7 +26,9 @@ spec:
 
 * What do I need?
 
-You need KVM and libvirtd installed on your host machine.
+You need KVM and libvirtd installed on your host machine and Kubernetes installed too.
+
+You could use `kubeadm` for this. For Cloud turn on nested-virt with GCP or use Packet.net/Scaleway for a bare metal host.
 
 * How does it work?
 
