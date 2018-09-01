@@ -97,9 +97,9 @@ It could be used to create `docker-machine` VMs instead of `minikube` clusters f
 * Make a global settings folder:
 
 ```
-sudo mkdir /var/mkaas
-sudo /root/.minikube
-sudo /root/.kube
+sudo mkdir -p /var/mkaas
+sudo mkdir -p /root/.minikube
+sudo mkdir -p /root/.kube
 ```
 
 * (Optional) Clone this repo into the $GOPATH
