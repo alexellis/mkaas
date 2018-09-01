@@ -81,6 +81,10 @@ Yes and if you use an NFS mount it may even allow for "motion" between hosts.
 
 Untested, but [perhaps](https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/)?
 
+* Has anyone had this idea before?
+
+The [kube-virt](https://github.com/kubevirt/kubevirt) project has an open issue suggesting [this is in the works for them](https://github.com/kubevirt/kubevirt/issues/736).
+
 ## Usage:
 
 * Install [operator-sdk](https://github.com/operator-framework/operator-sdk)
