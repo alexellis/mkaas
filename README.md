@@ -85,7 +85,13 @@ Untested, but [perhaps](https://docs.fedoraproject.org/en-US/quick-docs/using-ne
 
 The [kube-virt](https://github.com/kubevirt/kubevirt) project has an open issue suggesting [this is in the works for them](https://github.com/kubevirt/kubevirt/issues/736).
 
+* What else could this do?
+
+It could be used to create `docker-machine` VMs instead of `minikube` clusters for temporary environments to perform isolated Docker builds.
+
 ## Usage:
+
+This step is optional if you want to do development.
 
 * Install [operator-sdk](https://github.com/operator-framework/operator-sdk)
 
