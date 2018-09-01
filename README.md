@@ -1,5 +1,17 @@
 # mkaas
-Minikube as a Service
+
+Minikube as a Service (mkaas)
+
+mkaas provides a declarative way to create Kubernetes clusters using minikube within 1-2 minutes each.
+
+* Create your named Minikube YAML file (custom resource) using details below
+* Let mkaas do its thing
+* Download the `.kube/config` from the designated node
+* Set an environmental proxy setting to the node to reach the cluster on its private subnet
+* Profit with `kubectl`, NodePorts, etc
+* Tear down with `kubectl delete minikube/cluster_name` when you're done or add additional clusters
+
+Status: this is a Proof-of-Concept Kubernetes Operator providing Minikube-as-a-Service or `mkaas`.
 
 ## PoC demo
 
@@ -44,6 +56,12 @@ If you delete the custom resource i.e. `kubectl -n clusters delete minikube/alex
 * Are restarts supported.
 
 Yes
+
+* Is this production-ready?
+
+Due to the privileges required to execute minikube commands this should not be run in a production environment or on clusters containing confidential data. In the future this may be able to be restricted to just a `libvirtd` socket.
+
+The proxy container runs on the host network which means using this proxy you can reach any hosts reachable from the host node. In the future some limitations on the subnet could be applied - i.e. to only allow outgoing via the minikube subnet.
 
 * Are multiple hosts supported?
 
@@ -96,6 +114,8 @@ Connecting to cluster...
 Setting up kubeconfig...
 Starting cluster components...
 ```
+
+Wait until you see the bundle created.
 
 Now you can access the cluster from the host using `kubectl` by retrieving the IP of the
 cluster and the IP of the node.
@@ -150,7 +170,7 @@ export KUBECONFIG=.kube/config
 
 kubectl get node
 NAME       STATUS    ROLES     AGE       VERSION
-minikube   Ready     master    24m       v1.10.0
+minikube   Ready     master    1m        v1.10.0
 ```
 
 * Deploy a test workload and access over the proxy
@@ -189,3 +209,9 @@ Operator logs:
 ```
 kubectl logs -n clusters deploy/minikube -f
 ```
+
+## License
+
+MIT License
+
+Copyright Alex Ellis 2018
