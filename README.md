@@ -77,6 +77,10 @@ The proxy container runs on the host network which means using this proxy you ca
 
 Yes and if you use an NFS mount it may even allow for "motion" between hosts.
 
+* Can nested virt be used?
+
+Untested, but [perhaps](https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/)?
+
 ## Usage:
 
 * Install [operator-sdk](https://github.com/operator-framework/operator-sdk)
@@ -212,12 +216,24 @@ sleep 5
 echo "MKAAS!" | faas-cli invoke figlet
 ```
 
-## Development
+## Development / troubleshooting
 
 Operator logs:
 
 ```
 kubectl logs -n clusters deploy/minikube -f
+```
+
+Events:
+
+```
+kubectl get events --sort-by='{.firstTimestamp}' -n clusters
+```
+
+Resources:
+
+```
+kubectl get all -n clusters
 ```
 
 ## License
