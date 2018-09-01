@@ -37,6 +37,10 @@ of minikube. The VMs are created using `minikube start`.
 
 VMs are stored in /root/.minikube and this folder is mounted by the controller.
 
+* How are machines deleted?
+
+If you delete the custom resource i.e. `kubectl -n clusters delete minikube/alex` then the Pod will be reclaimed. It has a script listening for sigterm / sigint and will call `minikube destroy`.
+
 * Are restarts supported.
 
 Yes
@@ -96,13 +100,7 @@ Starting cluster components...
 Now you can access the cluster from the host using `kubectl` by retrieving the IP of the
 cluster and the IP of the node.
 
-Run squid on the host with host-networking (in the future this will be automated)
-
-This will be automated later, but for now:
-
-```
-docker run -d --name proxy --net=host alexellis2/squid-proxy:0.1
-```
+Squid will now be run on the host node as part of a daemonset exposing port `3128`. It requires host networking to be able to reach the minikube network.
 
 Now:
 
