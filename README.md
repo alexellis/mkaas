@@ -59,17 +59,17 @@ You could use `kubeadm` for this. For Cloud turn on nested-virt with GCP or use 
 
 * How does it work?
 
-It uses a privileged Pod found in ./agent/. The container inside the Pod has
+It uses a privileged Pod found in `./agent/`. The container inside the Pod has
 privileged access to the host and host networking which is required for the use
 of minikube. The VMs are created using `minikube start`.
 
-VMs are stored in /root/.minikube and this folder is mounted by the controller.
+VMs are stored in `/root/.minikube` and this folder is mounted by the controller.
 
 * How are machines deleted?
 
 If you delete the custom resource i.e. `kubectl -n clusters delete minikube/alex` then the Pod will be reclaimed. It has a script listening for sigterm / sigint and will call `minikube destroy`.
 
-* Are restarts supported.
+* Are restarts supported?
 
 Yes
 
@@ -107,7 +107,7 @@ sudo mkdir -p /root/.minikube
 sudo mkdir -p /root/.kube
 ```
 
-* (Optional) Clone this repo into the $GOPATH
+* (Optional) Clone this repo into the `$GOPATH`
 
 ```bash
 mkdir -p /go/src/github.com/operator-framework/operator-sdk/
