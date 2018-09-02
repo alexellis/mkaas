@@ -57,7 +57,7 @@ Follow [these steps](https://gist.github.com/alexellis/eec21a96906726d08a071d58a
 
 You could use `kubeadm` for this. For Cloud turn on nested-virt with GCP or use Packet.net/Scaleway for a bare metal host.
 
-* How does it work?
+### How does it work?
 
 It uses a privileged Pod found in `./agent/`. The container inside the Pod has
 privileged access to the host and host networking which is required for the use
@@ -65,33 +65,33 @@ of minikube. The VMs are created using `minikube start`.
 
 VMs are stored in `/root/.minikube` and this folder is mounted by the controller.
 
-* How are machines deleted?
+### How are machines deleted?
 
 If you delete the custom resource i.e. `kubectl -n clusters delete minikube/alex` then the Pod will be reclaimed. It has a script listening for sigterm / sigint and will call `minikube destroy`.
 
-* Are restarts supported?
+### Are restarts supported?
 
 Yes
 
-* Is this production-ready?
+### Is this production-ready?
 
 Due to the privileges required to execute minikube commands this should not be run in a production environment or on clusters containing confidential data. In the future this may be able to be restricted to just a `libvirtd` socket.
 
 The proxy container runs on the host network which means using this proxy you can reach any hosts reachable from the host node. In the future some limitations on the subnet could be applied - i.e. to only allow outgoing via the minikube subnet.
 
-* Are multiple hosts supported?
+### Are multiple hosts supported?
 
 Yes and if you use an NFS mount it may even allow for "motion" between hosts.
 
-* Can nested virt be used?
+### Can nested virt be used?
 
 Untested, but [perhaps](https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/)?
 
-* Has anyone had this idea before?
+### Has anyone had this idea before?
 
 The [kube-virt](https://github.com/kubevirt/kubevirt) project has an open issue suggesting [this is in the works for them](https://github.com/kubevirt/kubevirt/issues/736).
 
-* What else could this do?
+### What else could this do?
 
 It could be used to create `docker-machine` VMs instead of `minikube` clusters for temporary environments to perform isolated Docker builds.
 
