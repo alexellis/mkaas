@@ -58,7 +58,7 @@ It uses a privileged Pod found in ./agent/. The container inside the Pod has
 privileged access to the host and host networking which is required for the use
 of minikube. The VMs are created using `minikube start`.
 
-VMs are stored in /root/.minikube and this folder is mounted by the controller.
+VMs are stored in `/var/mkaas/.minikube/` and this folder is mounted by the controller.
 
 * How are machines deleted?
 
@@ -119,9 +119,9 @@ sudo apt update \
 If using public cloud you can install the `ufw` firewall to block access to the squid proxy which will be deployed on each node on port `3128`.
 
 ```bash
-sudo -i
+sudo apt install ufw -qy
 
-apt install ufw -qy
+sudo -i
 ufw default deny incoming
 ufw default allow outgoing
 ufw allow ssh
@@ -142,8 +142,8 @@ sudo mkdir -p /var/mkaas
 Create the following directories, or create a cluster using `minikube start` and delete it after which will do the same thing.
 
 ```bash
-sudo mkdir -p /root/.minikube
-sudo mkdir -p /root/.kube
+sudo mkdir -p /var/mkaas/.minikube
+sudo mkdir -p /var/mkaas/.kube
 ```
 
 * Clone this repo into the $GOPATH
@@ -160,7 +160,8 @@ cd minikube
 * (Optional) Build/push (optional to rebuild)
 
 ```bash
-operator-sdk build alexellis2/mko:v0.0.5 && docker push alexellis2/mko:v0.0.5
+operator-sdk build alexellis2/mko:v0.0.6 \
+  && docker push alexellis2/mko:v0.0.6
 ```
 
 * Deploy on a host:
@@ -207,7 +208,7 @@ Now:
 Get your Minikube IP either when we copy the .kube/config file down later on, or on the host with this command:
 
 ```bash
-sudo -i minikube ip --profile alex
+sudo -i MINIKUBE_HOME=/var/mkaas/.minikube/ minikube ip --profile alex
 192.168.39.125
 ```
 

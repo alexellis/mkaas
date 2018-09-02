@@ -119,9 +119,6 @@ func newMinikubePod(cr *v1alpha1.Minikube) *corev1.Pod {
 			Labels: labels,
 		},
 		Spec: corev1.PodSpec{
-			// SecurityContext: &corev1.PodSecurityContext{
-			// 	RunAsUser: &user,
-			// },
 			Volumes: []corev1.Volume{
 				{
 					Name: "kvm",
@@ -150,24 +147,6 @@ func newMinikubePod(cr *v1alpha1.Minikube) *corev1.Pod {
 					},
 				},
 				{
-					Name: "root-minikube",
-					VolumeSource: corev1.VolumeSource{
-						HostPath: &corev1.HostPathVolumeSource{
-							Path: "/root/.minikube",
-							Type: &pathTypeHostDir,
-						},
-					},
-				},
-				{
-					Name: "root-kube",
-					VolumeSource: corev1.VolumeSource{
-						HostPath: &corev1.HostPathVolumeSource{
-							Path: "/root/.kube",
-							Type: &pathTypeHostDir,
-						},
-					},
-				},
-				{
 					Name: "var-mkaas",
 					VolumeSource: corev1.VolumeSource{
 						HostPath: &corev1.HostPathVolumeSource{
@@ -181,7 +160,7 @@ func newMinikubePod(cr *v1alpha1.Minikube) *corev1.Pod {
 			Containers: []corev1.Container{
 				{
 					Name:  "libvirt",
-					Image: "alexellis2/libvirt-xenial-minikube:0.3",
+					Image: "alexellis2/libvirt-xenial-minikube:0.4",
 					SecurityContext: &corev1.SecurityContext{
 						Privileged: &privileged,
 					},
@@ -209,16 +188,6 @@ func newMinikubePod(cr *v1alpha1.Minikube) *corev1.Pod {
 						{
 							MountPath:        "/var/lib/libvirt",
 							Name:             "virsh-lib",
-							MountPropagation: &propagate,
-						},
-						{
-							MountPath:        "/root/.minikube",
-							Name:             "root-minikube",
-							MountPropagation: &propagate,
-						},
-						{
-							MountPath:        "/root/.kube",
-							Name:             "root-kube",
 							MountPropagation: &propagate,
 						},
 						{
