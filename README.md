@@ -36,7 +36,7 @@ spec:
   memoryMB: 2048
 ```
 
-* What do I need?
+### What do I need?
 
 On your host you'll need virtualization support / KVM support.
 
@@ -46,7 +46,7 @@ On your host you'll need virtualization support / KVM support.
 
 Add the KVM packages for your distro (tested with Ubuntu):
 
-```
+```bash
 sudo apt-get install -qy \
   qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
 sudo kvm-ok
@@ -95,14 +95,13 @@ The [kube-virt](https://github.com/kubevirt/kubevirt) project has an open issue 
 
 It could be used to create `docker-machine` VMs instead of `minikube` clusters for temporary environments to perform isolated Docker builds.
 
-## Usage:
-
+## Usage
 
 * (Optional) Install [operator-sdk](https://github.com/operator-framework/operator-sdk)
 
 * Make a global settings folder:
 
-```
+```bash
 sudo mkdir -p /var/mkaas
 sudo mkdir -p /root/.minikube
 sudo mkdir -p /root/.kube
@@ -110,7 +109,7 @@ sudo mkdir -p /root/.kube
 
 * (Optional) Clone this repo into the $GOPATH
 
-```
+```bash
 mkdir -p /go/src/github.com/operator-framework/operator-sdk/
 cd /go/src/github.com/operator-framework/operator-sdk/
 git clone https://github.com/operator-framework/operator-sdk
@@ -121,7 +120,7 @@ cd minikube
 
 * (Optional) Build/push (optional to rebuild)
 
-```
+```bash
 operator-sdk build alexellis2/mko:v0.0.5 && docker push alexellis2/mko:v0.0.5
 ```
 
@@ -129,7 +128,7 @@ operator-sdk build alexellis2/mko:v0.0.5 && docker push alexellis2/mko:v0.0.5
 
 Setup the Operator, RBAC and CRD:
 
-```
+```bash
 kubectl create ns clusters
 cd deploy
 kubectl apply -f crd.yaml,operator.yaml,rbac.yaml
@@ -137,7 +136,7 @@ kubectl apply -f crd.yaml,operator.yaml,rbac.yaml
 
 Now create the first cluster:
 
-```
+```bash
 kubectl apply -f cr.yaml
 ```
 
@@ -145,7 +144,7 @@ This will create your first cluster and place a helper Pod into the `clusters` n
 
 Check the logs:
 
-```
+```bash
 kubectl logs -n clusters pod/alex-minikube -f
 Starting local Kubernetes v1.10.0 cluster...
 Starting VM...
@@ -168,7 +167,7 @@ Now:
 
 Get your Minikube IP either when we copy the .kube/config file down later on, or on the host with this command:
 
-```
+```bash
 sudo -i minikube ip --profile alex
 192.168.39.125
 ```
@@ -179,7 +178,7 @@ On your client:
 
 For HTTP access:
 
-```
+```bash
 export http_proxy=http://node_ip:3128
 faas-cli list --gateway $MINIKUBE_IP
 ```
@@ -188,7 +187,7 @@ For access via `kubectl`:
 
 Copy the bundle to your client/laptop and untar using (sftp/scp):
 
-```
+```bash
 mkdir -p mkaas
 cd mkaas
 
@@ -198,7 +197,7 @@ tar -xvf alex-bundle.tgz
 
 If your home directory is `/home/alex/` then do the following:
 
-``` 
+``` bash
 sed -ie 's#/root/#/home/alex/mkaas/#g' .kube/config
 ```
 
@@ -206,7 +205,7 @@ This changes the absolute paths used for the root user to match the point you co
 
 Now:
 
-```
+```bash
 export http_proxy=http://node_ip:3128
 export KUBECONFIG=.kube/config
 
@@ -219,13 +218,13 @@ minikube   Ready     master    1m        v1.10.0
 
 Add the CLI if not present:
 
-```
+```bash
 curl -sLSf https://cli.openfaas.com | sudo sh
 ```
 
 Deploy OpenFaaS:
 
-```
+```bash
 git clone https://github.com/openfaas/faas-netes
 kubectl apply -f ./faas-netes/namespaces.yml,./faas-netes/yaml
 rm -rf faas-netes
@@ -248,19 +247,19 @@ echo "MKAAS!" | faas-cli invoke figlet
 
 Operator logs:
 
-```
+```bash
 kubectl logs -n clusters deploy/minikube -f
 ```
 
 Events:
 
-```
+```bash
 kubectl get events --sort-by='{.firstTimestamp}' -n clusters
 ```
 
 Resources:
 
-```
+```bash
 kubectl get all -n clusters
 ```
 
