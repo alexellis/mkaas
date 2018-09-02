@@ -44,18 +44,13 @@ On your host you'll need virtualization support / KVM support.
 * libvirtd
 * Kubernetes (a single-node tainted master with kubeadm is fine)
 
-Add the KVM packages for your distro (tested with Ubuntu):
-
-```
-sudo apt-get install -qy \
-  qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker
-sudo kvm-ok
-sudo usermod root -aG libvirtd
-```
+Add the KVM packages for your distro (tested with Ubuntu)
 
 Follow [these steps](https://gist.github.com/alexellis/eec21a96906726d08a071d58aee66ab9#create-a-cluster-with-kubeadm) on Ubuntu 16.04 up until you get to "Create a cluster with kubeadm".
 
 You could use `kubeadm` for this. For Cloud turn on nested-virt with GCP or use Packet.net/Scaleway for a bare metal host.
+
+> Note: if you use a public host, then I recommend you setup a firewall rule with `ufw` to block access to port 3128 on the host. You can still make use of the proxy using an SSH tunnel. The bundled squid proxy is set up to allow open access. `ssh -L 3128:3128 -N remote-host` then replace the HTTP proxy with `127.0.0.1:3128`.
 
 * How does it work?
 
@@ -97,20 +92,63 @@ It could be used to create `docker-machine` VMs instead of `minikube` clusters f
 
 ## Usage:
 
+* Install Kubernetes with `kubeadm`
+
+Use one of my guides:
+
+[Your instant Kubernetes cluster](https://blog.alexellis.io/your-instant-kubernetes-cluster/)
+
+After running `kubeadm init` don't forget to deploy a network driver (included in guide) and to taint the master if you're using a single node.
+
+```bash
+kubectl taint nodes --all node-role.kubernetes.io/master-
+```
+
+* Install KVM and libvirtd
+
+```bash
+sudo apt update \
+  && sudo apt-get install -qy \
+    git qemu-kvm libvirt-bin virtinst bridge-utils cpu-checker --no-install-recommends \
+  && sudo kvm-ok \
+  && sudo usermod root -aG libvirtd
+```
+
+* Install `ufw` firewall
+
+If using public cloud you can install the `ufw` firewall to block access to the squid proxy which will be deployed on each node on port `3128`.
+
+```bash
+sudo -i
+
+apt install ufw -qy
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow ssh
+ufw enable
+ufw status verbose
+```
+
+This has now blocked any access incoming to your server apart from when using ssh on TCP port 22.
 
 * (Optional) Install [operator-sdk](https://github.com/operator-framework/operator-sdk)
 
 * Make a global settings folder:
 
-```
+```bash
 sudo mkdir -p /var/mkaas
+```
+
+Optionally create these directories, or create a cluster using `minikube start` and delete it after.
+
+```bash
 sudo mkdir -p /root/.minikube
 sudo mkdir -p /root/.kube
 ```
 
-* (Optional) Clone this repo into the $GOPATH
+* Clone this repo into the $GOPATH
 
-```
+```bash
 mkdir -p /go/src/github.com/operator-framework/operator-sdk/
 cd /go/src/github.com/operator-framework/operator-sdk/
 git clone https://github.com/operator-framework/operator-sdk
@@ -121,7 +159,7 @@ cd minikube
 
 * (Optional) Build/push (optional to rebuild)
 
-```
+```bash
 operator-sdk build alexellis2/mko:v0.0.5 && docker push alexellis2/mko:v0.0.5
 ```
 
@@ -129,7 +167,7 @@ operator-sdk build alexellis2/mko:v0.0.5 && docker push alexellis2/mko:v0.0.5
 
 Setup the Operator, RBAC and CRD:
 
-```
+```bash
 kubectl create ns clusters
 cd deploy
 kubectl apply -f crd.yaml,operator.yaml,rbac.yaml
@@ -137,7 +175,7 @@ kubectl apply -f crd.yaml,operator.yaml,rbac.yaml
 
 Now create the first cluster:
 
-```
+```bash
 kubectl apply -f cr.yaml
 ```
 
@@ -145,7 +183,7 @@ This will create your first cluster and place a helper Pod into the `clusters` n
 
 Check the logs:
 
-```
+```bash
 kubectl logs -n clusters pod/alex-minikube -f
 Starting local Kubernetes v1.10.0 cluster...
 Starting VM...
@@ -168,19 +206,32 @@ Now:
 
 Get your Minikube IP either when we copy the .kube/config file down later on, or on the host with this command:
 
-```
+```bash
 sudo -i minikube ip --profile alex
 192.168.39.125
 ```
 
 Note down your minikube IP, for example: `192.168.39.125`.
 
-On your client:
+Run these commands on your remote client/laptop:
 
-For HTTP access:
+For HTTP access on local network:
+
+```bash
+export http_proxy=http://node_ip:3128
+faas-cli list --gateway $MINIKUBE_IP
+```
+
+If using a remote host with `ufw` enabled then open an SSH tunnel to give you access to the remote squid proxy instance:
 
 ```
-export http_proxy=http://node_ip:3128
+ssh -L 3128:3128 -N node_ip
+```
+
+With the SSH tunnel the config for the `http_proxy` environmental variable would become as follows:
+
+```bash
+export http_proxy=http://127.0.0.1:3128
 faas-cli list --gateway $MINIKUBE_IP
 ```
 
@@ -188,7 +239,7 @@ For access via `kubectl`:
 
 Copy the bundle to your client/laptop and untar using (sftp/scp):
 
-```
+```bash
 mkdir -p mkaas
 cd mkaas
 
@@ -198,7 +249,7 @@ tar -xvf alex-bundle.tgz
 
 If your home directory is `/home/alex/` then do the following:
 
-``` 
+```bash
 sed -ie 's#/root/#/home/alex/mkaas/#g' .kube/config
 ```
 
@@ -206,7 +257,7 @@ This changes the absolute paths used for the root user to match the point you co
 
 Now:
 
-```
+```bash
 export http_proxy=http://node_ip:3128
 export KUBECONFIG=.kube/config
 
@@ -219,13 +270,13 @@ minikube   Ready     master    1m        v1.10.0
 
 Add the CLI if not present:
 
-```
+```bash
 curl -sLSf https://cli.openfaas.com | sudo sh
 ```
 
 Deploy OpenFaaS:
 
-```
+```bash
 git clone https://github.com/openfaas/faas-netes
 kubectl apply -f ./faas-netes/namespaces.yml,./faas-netes/yaml
 rm -rf faas-netes
@@ -246,21 +297,23 @@ echo "MKAAS!" | faas-cli invoke figlet
 
 ## Development / troubleshooting
 
+Run these commands on your host node.
+
 Operator logs:
 
-```
+```bash
 kubectl logs -n clusters deploy/minikube -f
 ```
 
 Events:
 
-```
+```bash
 kubectl get events --sort-by='{.firstTimestamp}' -n clusters
 ```
 
 Resources:
 
-```
+```bash
 kubectl get all -n clusters
 ```
 
