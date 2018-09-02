@@ -139,7 +139,7 @@ This has now blocked any access incoming to your server apart from when using ss
 sudo mkdir -p /var/mkaas
 ```
 
-Optionally create these directories, or create a cluster using `minikube start` and delete it after.
+Create the following directories, or create a cluster using `minikube start` and delete it after which will do the same thing.
 
 ```bash
 sudo mkdir -p /root/.minikube
