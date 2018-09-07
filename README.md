@@ -63,7 +63,7 @@ sudo apt update \
 
 * Install `ufw` firewall
 
-If using public cloud you can install the `ufw` firewall to block access to the squid proxy which will be deployed on each node on port `3128`.
+If using public cloud you can install the `ufw` firewall to block access to the squid proxy which will be deployed on each node on port `3129`.
 
 ```bash
 sudo apt install ufw -qy
@@ -151,7 +151,7 @@ Wait until you see the bundle created.
 Now you can access the cluster from the host using `kubectl` by retrieving the IP of the
 cluster and the IP of the node.
 
-Squid will now be run on the host node as part of a daemonset exposing port `3128`. It requires host networking to be able to reach the minikube network.
+Squid will now be run on the host node as part of a daemonset exposing port `3129`. It requires host networking to be able to reach the minikube network.
 
 Now:
 
@@ -169,20 +169,20 @@ Run these commands on your remote client/laptop:
 For HTTP access on local network:
 
 ```bash
-export http_proxy=http://node_ip:3128
+export http_proxy=http://node_ip:3129
 faas-cli list --gateway $MINIKUBE_IP
 ```
 
 If using a remote host with `ufw` enabled then open an SSH tunnel to give you access to the remote squid proxy instance:
 
 ```
-ssh -L 3128:3128 -N node_ip
+ssh -L 3129:3129 -N node_ip
 ```
 
 With the SSH tunnel the config for the `http_proxy` environmental variable would become as follows:
 
 ```bash
-export http_proxy=http://127.0.0.1:3128
+export http_proxy=http://127.0.0.1:3129
 faas-cli list --gateway $MINIKUBE_IP
 ```
 
@@ -209,7 +209,7 @@ This changes the absolute paths used for the root user to match the point you co
 Now:
 
 ```bash
-export http_proxy=http://node_ip:3128
+export http_proxy=http://node_ip:3129
 export KUBECONFIG=.kube/config
 
 kubectl get node
@@ -284,7 +284,7 @@ Follow [these steps](https://gist.github.com/alexellis/eec21a96906726d08a071d58a
 
 You could use `kubeadm` for this. For cloud hosts turn on nested-virt with GCP or use Packet.net/Scaleway for a bare metal host.
 
-> Note: if you use a public host, then I recommend you setup a firewall rule with `ufw` to block access to port 3128 on the host. You can still make use of the proxy using an SSH tunnel. The bundled squid proxy is set up to allow open access. `ssh -L 3128:3128 -N remote-host` then replace the HTTP proxy with `127.0.0.1:3128`.
+> Note: if you use a public host, then I recommend you setup a firewall rule with `ufw` to block access to port 3129 on the host. You can still make use of the proxy using an SSH tunnel. The bundled squid proxy is set up to allow open access. `ssh -L 3129:3129 -N remote-host` then replace the HTTP proxy with `127.0.0.1:3129`.
 
 * How does it work?
 
