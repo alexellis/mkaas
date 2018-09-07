@@ -5,17 +5,13 @@ Minikube as a Service (mkaas)
 mkaas provides a declarative way to create Kubernetes clusters using minikube within 1-2 minutes each.
 
 * Create your named Minikube YAML file (custom resource) using details below
-* Let mkaas do its thing
+* The mkaas operator will do its thing and run `minikube start` for you on a given node using KVM
 * Download the `.kube/config` from the designated node
 * Set an environmental proxy setting to the node to reach the cluster on its private subnet
 * Profit with `kubectl`, NodePorts, etc
 * Tear down with `kubectl delete minikube/cluster_name` when you're done or add additional clusters
 
 Status: this is a Proof-of-Concept Kubernetes Operator providing Minikube-as-a-Service or `mkaas`.
-
-## PoC demo
-
-[![asciicast](https://asciinema.org/a/O0pWQ6p7slnQ2X8Q5qtIjHqZG.png)](https://asciinema.org/a/O0pWQ6p7slnQ2X8Q5qtIjHqZG)
 
 ## How does it work?
 
@@ -36,61 +32,12 @@ spec:
   memoryMB: 2048
 ```
 
-* What do I need?
+## PoC demo
 
-On your host you'll need virtualization support / KVM support.
+[![asciicast](https://asciinema.org/a/O0pWQ6p7slnQ2X8Q5qtIjHqZG.png)](https://asciinema.org/a/O0pWQ6p7slnQ2X8Q5qtIjHqZG)
 
-* KVM package
-* libvirtd
-* Kubernetes (a single-node tainted master with kubeadm is fine)
 
-Add the KVM packages for your distro (tested with Ubuntu)
-
-Follow [these steps](https://gist.github.com/alexellis/eec21a96906726d08a071d58aee66ab9#create-a-cluster-with-kubeadm) on Ubuntu 16.04 up until you get to "Create a cluster with kubeadm".
-
-You could use `kubeadm` for this. For Cloud turn on nested-virt with GCP or use Packet.net/Scaleway for a bare metal host.
-
-> Note: if you use a public host, then I recommend you setup a firewall rule with `ufw` to block access to port 3128 on the host. You can still make use of the proxy using an SSH tunnel. The bundled squid proxy is set up to allow open access. `ssh -L 3128:3128 -N remote-host` then replace the HTTP proxy with `127.0.0.1:3128`.
-
-* How does it work?
-
-It uses a privileged Pod found in ./agent/. The container inside the Pod has
-privileged access to the host and host networking which is required for the use
-of minikube. The VMs are created using `minikube start`.
-
-VMs are stored in `/var/mkaas/.minikube/` and this folder is mounted by the controller.
-
-* How are machines deleted?
-
-If you delete the custom resource i.e. `kubectl -n clusters delete minikube/alex` then the Pod will be reclaimed. It has a script listening for sigterm / sigint and will call `minikube destroy`.
-
-* Are restarts supported.
-
-Yes
-
-* Is this production-ready?
-
-Due to the privileges required to execute minikube commands this should not be run in a production environment or on clusters containing confidential data. In the future this may be able to be restricted to just a `libvirtd` socket.
-
-The proxy container runs on the host network which means using this proxy you can reach any hosts reachable from the host node. In the future some limitations on the subnet could be applied - i.e. to only allow outgoing via the minikube subnet.
-
-* Are multiple hosts supported?
-
-Yes and if you use an NFS mount it may even allow for "motion" between hosts.
-
-* Can nested virt be used?
-
-Untested, but [perhaps](https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/)?
-
-* Has anyone had this idea before?
-
-The [kube-virt](https://github.com/kubevirt/kubevirt) project has an open issue suggesting [this is in the works for them](https://github.com/kubevirt/kubevirt/issues/736).
-
-* What else could this do?
-
-It could be used to create `docker-machine` VMs instead of `minikube` clusters for temporary environments to perform isolated Docker builds.
-
-## Usage:
+## Quick-start:
 
 * Install Kubernetes with `kubeadm`
 
@@ -122,9 +69,12 @@ If using public cloud you can install the `ufw` firewall to block access to the 
 sudo apt install ufw -qy
 
 sudo -i
+
 ufw default deny incoming
 ufw default allow outgoing
 ufw allow ssh
+ufw allow 443
+ufw allow 8443
 ufw enable
 ufw status verbose
 ```
@@ -317,6 +267,62 @@ Resources:
 ```bash
 kubectl get all -n clusters
 ```
+
+## Q&A
+
+* What do I need?
+
+On your host you'll need virtualization support with KVM.
+
+* KVM packages on your Linux distro
+* libvirtd
+* Kubernetes installed via `kubeadm` or similar tool. A tainted master will work.
+
+Add the KVM packages for your distro (tested with Ubuntu)
+
+Follow [these steps](https://gist.github.com/alexellis/eec21a96906726d08a071d58aee66ab9#create-a-cluster-with-kubeadm) on Ubuntu 16.04 up until you get to "Create a cluster with kubeadm".
+
+You could use `kubeadm` for this. For cloud hosts turn on nested-virt with GCP or use Packet.net/Scaleway for a bare metal host.
+
+> Note: if you use a public host, then I recommend you setup a firewall rule with `ufw` to block access to port 3128 on the host. You can still make use of the proxy using an SSH tunnel. The bundled squid proxy is set up to allow open access. `ssh -L 3128:3128 -N remote-host` then replace the HTTP proxy with `127.0.0.1:3128`.
+
+* How does it work?
+
+It uses a privileged Pod found in ./agent/. The container inside the Pod has
+privileged access to the host and host networking which is required for the use
+of minikube. The VMs are created using `minikube start`.
+
+VMs are stored in `/var/mkaas/.minikube/` and this folder is mounted by the controller.
+
+* How are machines deleted?
+
+If you delete the custom resource i.e. `kubectl -n clusters delete minikube/alex` then the Pod will be reclaimed. It has a script listening for sigterm / sigint and will call `minikube destroy`.
+
+* Are restarts supported.
+
+Yes
+
+* Is this production-ready?
+
+Due to the privileges required to execute minikube commands this should not be run in a production environment or on clusters containing confidential data. In the future this may be able to be restricted to just a `libvirtd` socket.
+
+The proxy container runs on the host network which means using this proxy you can reach any hosts reachable from the host node. In the future some limitations on the subnet could be applied - i.e. to only allow outgoing via the minikube subnet.
+
+* Are multiple hosts supported?
+
+Yes and if you use an NFS mount it may even allow for "motion" between hosts.
+
+* Can nested virt be used?
+
+Untested, but [perhaps](https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/)?
+
+* Has anyone had this idea before?
+
+The [kube-virt](https://github.com/kubevirt/kubevirt) project has an open issue suggesting [this is in the works for them](https://github.com/kubevirt/kubevirt/issues/736).
+
+* What else could this do?
+
+It could be used to create `docker-machine` VMs instead of `minikube` clusters for temporary environments to perform isolated Docker builds.
 
 ## License
 
