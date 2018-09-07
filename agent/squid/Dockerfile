@@ -1,6 +1,8 @@
-FROM alpine:latest
+FROM alpine:3.7
 
 RUN apk --update add squid
+
+RUN sed -ie s/"3128/3129"/g /etc/squid/squid.conf
 
 # This step enables access from private IP address ranges.
 # RUN sed -ie s/"http_access deny all"/"http_access allow all"/g /etc/squid/squid.conf

@@ -33,11 +33,12 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 			return err
 		}
 
-		err2 := sdk.Create(newProxyDaemonset(o))
-		if err2 != nil && !errors.IsAlreadyExists(err2) {
-			logrus.Errorf("failed to create pod : %v", err2)
-			return err2
-		}
+		// Note - now created via proxy-ds.yaml
+		// err2 := sdk.Create(newProxyDaemonset(o))
+		// if err2 != nil && !errors.IsAlreadyExists(err2) {
+		// 	logrus.Errorf("failed to create pod : %v", err2)
+		// 	return err2
+		// }
 	}
 
 	return nil
@@ -75,7 +76,7 @@ func newProxyDaemonset(cr *v1alpha1.Minikube) *v1beta1.DaemonSet {
 					Containers: []corev1.Container{
 						{
 							Name:  "proxy",
-							Image: "alexellis2/squid-proxy:0.1",
+							Image: "alexellis2/squid-proxy:0.2",
 							Ports: []corev1.ContainerPort{
 								{
 									Name:          "squid",
