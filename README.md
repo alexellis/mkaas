@@ -34,8 +34,7 @@ spec:
 
 ## PoC demo
 
-[![asciicast](https://asciinema.org/a/O0pWQ6p7slnQ2X8Q5qtIjHqZG.png)](https://asciinema.org/a/O0pWQ6p7slnQ2X8Q5qtIjHqZG)
-
+Coming soon.
 
 ## Quick-start:
 
