@@ -11,11 +11,13 @@ mkaas provides a declarative way to create Kubernetes clusters using minikube wi
 * Profit with `kubectl`, NodePorts, etc
 * Tear down with `kubectl delete minikube/cluster_name` when you're done or add additional clusters
 
-Status:
+## Status:
 
 This is a Proof-of-Concept Kubernetes Operator providing Minikube-as-a-Service or `mkaas` through the use of CRDs and the [Operator Framework from CoreOS](https://coreos.com/blog/introducing-operator-framework).
 
 This project was put together as a private repo and last tested e2e Sep 2018 with additional testing and ASCII cinema coming soon. A small PR or change to instructions may be required for any subsequent changes in dependencies.
+
+*See the new version of this project over at [minikube-operator](https://github.com/alexellis/minikube-operator).*
 
 ## How does it work?
 
