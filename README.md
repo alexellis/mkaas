@@ -36,9 +36,9 @@ spec:
   memoryMB: 2048
 ```
 
-## PoC demo
+## ASCII Cinema
 
-Coming soon.
+Coming soon (previous link expired)
 
 ## Quick-start:
 
